@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.mgt.endpoint;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +35,8 @@ import org.owasp.encoder.Encode;
 import org.wso2.carbon.identity.mgt.endpoint.client.ApiException;
 import org.wso2.carbon.identity.mgt.endpoint.client.api.UsernameRecoveryApi;
 import org.wso2.carbon.identity.mgt.endpoint.client.model.Claim;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.Error;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.RetryError;
 import org.wso2.carbon.identity.mgt.endpoint.client.model.User;
 import org.wso2.carbon.identity.mgt.stub.beans.VerificationBean;
 
@@ -415,5 +418,38 @@ public class IdentityManagementEndpointUtil {
             }
         }
         return piis;
+    }
+
+    public static void addErrorInformation(HttpServletRequest request, Exception e) {
+        Error error = buildError(e);
+        addErrorInformation(request, error);
+    }
+
+    public static void addErrorInformation(HttpServletRequest request, Error errorD) {
+        request.setAttribute("error", true);
+        if (errorD != null) {
+            request.setAttribute("errorMsg", errorD.getDescription());
+            request.setAttribute("errorCode", errorD.getCode());
+        }
+    }
+
+    public static Error buildError(Exception e) {
+        try {
+            return new Gson().fromJson(e.getMessage(), Error.class);
+        } catch (JsonSyntaxException ex) {
+            // We cannot build proper error code and error messages from the exception.
+            log.error("Exception while retrieving error details from original exception. Original exception:", e);
+        }
+        return null;
+    }
+
+    public static RetryError buildRetryError(Exception e) {
+        try {
+            return new Gson().fromJson(e.getMessage(), RetryError.class);
+        } catch (JsonSyntaxException ex) {
+            // We cannot build proper error code and error messages from the exception.
+            log.error("Exception while retrieving error details from original exception. Original exception:", e);
+        }
+        return null;
     }
 }
