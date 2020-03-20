@@ -22,17 +22,23 @@ import org.apache.axiom.om.util.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.owasp.encoder.Encode;
 import org.wso2.carbon.identity.application.authentication.endpoint.util.bean.UserDTO;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * AuthenticationEndpointUtil defines utility methods used across the authenticationendpoint web application.
  */
 public class AuthenticationEndpointUtil {
+
     private static final String CUSTOM_PAGE_APP_SPECIFIC_CONFIG_KEY_SEPARATOR = "-";
     private static final String QUERY_STRING_APPENDER = "&";
     private static final String QUERY_STRING_INITIATOR = "?";
@@ -40,6 +46,7 @@ public class AuthenticationEndpointUtil {
     private static final String UNDERSCORE = "_";
 
     private AuthenticationEndpointUtil() {
+
     }
 
     /**
@@ -51,6 +58,7 @@ public class AuthenticationEndpointUtil {
      * @return the possible servlet context parameter key configured for the given application
      */
     public static String getApplicationSpecificCustomPageConfigKey(String serviceProviderName, String relativePath) {
+
         return serviceProviderName + CUSTOM_PAGE_APP_SPECIFIC_CONFIG_KEY_SEPARATOR + relativePath;
     }
 
@@ -78,30 +86,31 @@ public class AuthenticationEndpointUtil {
     /**
      * Cleaning the queryString.
      *
-     * @param queryString           query string of the incoming request
+     * @param queryString query string of the incoming request
      * @return redirect url of the custom page configuration
      */
     public static String cleanErrorMessages(String queryString) {
+
         StringBuilder cleanedQueryString = new StringBuilder();
-        if(queryString != null){
+        if (queryString != null) {
             String[] split = queryString.split("&");
-            for (int i = 0; i < split.length ; i++) {
+            for (int i = 0; i < split.length; i++) {
                 String query = split[i];
-                if(!query.startsWith(Constants.AUTH_FAILURE) && !query.startsWith(Constants.ERROR_CODE)){
+                if (!query.startsWith(Constants.AUTH_FAILURE) && !query.startsWith(Constants.ERROR_CODE)) {
                     cleanedQueryString.append(query);
                     cleanedQueryString.append("&");
                 }
             }
-            if(cleanedQueryString.length()>0 && cleanedQueryString.charAt(cleanedQueryString.length() - 1)=='&'){
-               return cleanedQueryString.substring(0,cleanedQueryString.length()-1);
+            if (cleanedQueryString.length() > 0 && cleanedQueryString.charAt(cleanedQueryString.length() - 1) == '&') {
+                return cleanedQueryString.substring(0, cleanedQueryString.length() - 1);
             }
         }
         return cleanedQueryString.toString();
     }
 
-
     /**
      * Build user object from complete username
+     *
      * @param userName
      * @return
      */
@@ -126,10 +135,12 @@ public class AuthenticationEndpointUtil {
 
     /**
      * This method will extract the userstore domain from the username
+     *
      * @param nameWithDomain username (ex: Secondary/alex)
      * @return user-store-domain (ex: Secondary) or null if domain is not present in the username
      */
     public static String extractDomainFromName(String nameWithDomain) {
+
         if (nameWithDomain.indexOf(UserCoreConstants.DOMAIN_SEPARATOR) > 0) {
             String domain = nameWithDomain.substring(0, nameWithDomain.indexOf(UserCoreConstants.DOMAIN_SEPARATOR));
             return domain.toUpperCase();
@@ -137,14 +148,17 @@ public class AuthenticationEndpointUtil {
             return null;
         }
     }
+
     /**
      * To get the property value for the given key from the ResourceBundle
      * Retrieve the value of property entry for key, return key if a value is not found for key
+     *
      * @param resourceBundle
      * @param key
      * @return
      */
     public static String i18n(ResourceBundle resourceBundle, String key) {
+
         try {
             return Encode.forHtml((StringUtils.isNotBlank(resourceBundle.getString(key)) ?
                     resourceBundle.getString(key) : key));
@@ -160,11 +174,13 @@ public class AuthenticationEndpointUtil {
      * Retrieve the value of property entry for where key is obtained after replacing "=" with "_" of base64 encoded
      * value of the given key,
      * return key if a value is not found for above calculated
+     *
      * @param resourceBundle
      * @param key
      * @return
      */
     public static String i18nBase64(ResourceBundle resourceBundle, String key) {
+
         String base64Key = Base64.encode(key.getBytes(StandardCharsets.UTF_8)).replaceAll(PADDING_CHAR, UNDERSCORE);
         try {
             return Encode.forHtml((StringUtils.isNotBlank(resourceBundle.getString(base64Key)) ?
@@ -192,6 +208,20 @@ public class AuthenticationEndpointUtil {
         } catch (Exception e) {
             return i18nBase64(resourceBundle, key);
         }
+    }
+
+    public static String getTenantDomain(HttpServletRequest request) {
+
+        String tenantDomain = (String) IdentityUtil.threadLocalProperties.get().get("TenantNameFromContext");
+        if (StringUtils.isBlank(tenantDomain)) {
+            tenantDomain = request.getParameter("tenantDomain");
+        }
+
+        if (StringUtils.isBlank(tenantDomain)) {
+            tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+
+        return tenantDomain;
     }
 }
 
