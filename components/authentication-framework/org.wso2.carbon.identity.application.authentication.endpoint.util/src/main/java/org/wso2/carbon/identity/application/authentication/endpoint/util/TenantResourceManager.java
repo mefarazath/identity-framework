@@ -20,98 +20,62 @@ import java.util.Map;
 
 public class TenantResourceManager {
 
-    private static Map<String, Preferences> tenants = new HashMap<>();
+    private static Map<String, Preference> tenants = new HashMap<>();
 
     static {
         tenants.put("abc.com",
-                new Preferences().style("https://mefarazath.github.io/abc.com.min.css").logo(null).title("ABC.COM"));
-        tenants.put("wso2.com",
-                new Preferences().style("https://mefarazath.github.io/wso2.com.min.css").logo(null).title("WSO2.COM"));
+                new Preference()
+                        .style("https://mefarazath.github.io/abc.com.min.css")
+                        .logo("https://upload.wikimedia.org/wikipedia/en/2/27/Alpha_Beta_Logo.PNG")
+                        .headerTitle("Alpha Beta Corporation")
+                        .title("")
+                        .footer("Alpha Beta Corporation"));
+
+        tenants.put("pandora.com", new Preference()
+                .style("https://mefarazath.github.io/pandora.com.min.css")
+                .logo("https://i.ya-webdesign.com/images/transparent-png-image-4.png")
+                .title("")
+                .headerTitle("Pandora Inc.")
+                .footer("Pandora Inc."));
     }
 
-    public static String getCustomStyle(String tenantDomain) {
+    public static Preference getPreferences(String tenantDomain) {
 
         if (tenants.containsKey(tenantDomain)) {
-            return tenants.get(tenantDomain).getStylePath();
+            return tenants.get(tenantDomain);
         }
-        return null;
+        return new Preference();
     }
 
-    public static String getTitleText(String tenantDomain) {
-
-        if (tenants.containsKey(tenantDomain)) {
-            return tenants.get(tenantDomain).getTitleText();
-        }
-        return null;
-    }
-
-    public boolean showPrivacyPolicy(String tenantDomain) {
-
-        if (tenants.containsKey(tenantDomain)) {
-            return tenants.get(tenantDomain).isShowPrivacyPolicy();
-        }
-        return false;
-    }
-
-    public String getCustomLogo(String tenantDomain) {
-
-        if (tenants.containsKey(tenantDomain)) {
-            return tenants.get(tenantDomain).getLogoPath();
-        }
-        return null;
-    }
-
-    static class Preferences {
-
-        private String stylePath;
-        private String titleText;
-        private String logoPath;
-        private boolean showPrivacyPolicy;
-
-        public String getStylePath() {
-
-            return stylePath;
-        }
-
-        public Preferences style(String stylePath) {
-
-            this.stylePath = stylePath;
-            return this;
-        }
-
-        public String getTitleText() {
-
-            return titleText;
-        }
-
-        public Preferences title(String titleText) {
-
-            this.titleText = titleText;
-            return this;
-
-        }
-
-        public String getLogoPath() {
-
-            return logoPath;
-        }
-
-        public Preferences logo(String logoPath) {
-
-            this.logoPath = logoPath;
-            return this;
-
-        }
-
-        public boolean isShowPrivacyPolicy() {
-
-            return showPrivacyPolicy;
-        }
-
-        public Preferences showPrivacyPolicy(boolean showPrivacyPolicy) {
-
-            this.showPrivacyPolicy = showPrivacyPolicy;
-            return this;
-        }
-    }
+//    public static String getCustomStyle(String tenantDomain) {
+//
+//        if (tenants.containsKey(tenantDomain)) {
+//            return tenants.get(tenantDomain).getStylePath();
+//        }
+//        return null;
+//    }
+//
+//    public static String getTitleText(String tenantDomain) {
+//
+//        if (tenants.containsKey(tenantDomain)) {
+//            return tenants.get(tenantDomain).getTitleText();
+//        }
+//        return null;
+//    }
+//
+//    public boolean showPrivacyPolicy(String tenantDomain) {
+//
+//        if (tenants.containsKey(tenantDomain)) {
+//            return tenants.get(tenantDomain).isShowPrivacyPolicy();
+//        }
+//        return false;
+//    }
+//
+//    public String getCustomLogo(String tenantDomain) {
+//
+//        if (tenants.containsKey(tenantDomain)) {
+//            return tenants.get(tenantDomain).getLogoPath();
+//        }
+//        return null;
+//    }
 }
