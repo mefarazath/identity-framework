@@ -26,6 +26,7 @@ import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.core.ServiceURL;
 import org.wso2.carbon.identity.core.ServiceURLBuilder;
+import org.wso2.carbon.identity.core.ServiceUrlOptions;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
@@ -48,6 +49,7 @@ import java.util.StringJoiner;
  */
 public class DefaultServiceURLBuilder implements ServiceURLBuilder {
 
+    private ServiceUrlOptions options;
     private String fragment;
     private String tenantDomain;
     private String[] urlPaths;
@@ -257,6 +259,13 @@ public class DefaultServiceURLBuilder implements ServiceURLBuilder {
         }
     }
 
+    @Override
+    public ServiceURLBuilder addOptions(ServiceUrlOptions options) {
+
+        this.options = options;
+        return this;
+    }
+
     /**
      * Returns {@link ServiceURLBuilder} appended the URL path.
      *
@@ -293,9 +302,18 @@ public class DefaultServiceURLBuilder implements ServiceURLBuilder {
         StringBuilder resolvedUrlStringBuilder = new StringBuilder();
 
         if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
-            if (StringUtils.isNotBlank(tenantDomain) &&
-                    !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            if (isNotSuperTenant(tenantDomain)) {
                 resolvedUrlStringBuilder.append("/t/").append(tenantDomain);
+            }
+        } else {
+            if (options != null) {
+                if (options.appendTenantDomainAsPathParam()) {
+                    if (isNotSuperTenant(tenantDomain)) {
+                        resolvedUrlStringBuilder.append("/t/").append(tenantDomain);
+                    }
+                } else if (options.appendTenantDomainAsQueryParam()) {
+                    parameters.put("tenantDomain", tenantDomain);
+                }
             }
         }
 
@@ -310,6 +328,12 @@ public class DefaultServiceURLBuilder implements ServiceURLBuilder {
         return new ServiceURLImpl(protocol, hostName, port, proxyContextPath, resolvedUrlStringBuilder.toString(),
                 parameters,
                 resolvedFragment);
+    }
+
+    private boolean isNotSuperTenant(String tenantDomain) {
+
+        return StringUtils.isNotBlank(tenantDomain) &&
+                !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain);
     }
 
     /**
@@ -357,9 +381,15 @@ public class DefaultServiceURLBuilder implements ServiceURLBuilder {
 
     private String resolveTenantDomain() {
 
-        String tenantDomain = IdentityTenantUtil.getTenantDomainFromContext();
-        if (StringUtils.isBlank(tenantDomain)) {
-            tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
+            tenantDomain = IdentityTenantUtil.getTenantDomainFromContext();
+            if (StringUtils.isBlank(tenantDomain)) {
+                tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            }
+        } else {
+            if (options != null) {
+                tenantDomain = options.getTenantDomain();
+            }
         }
         return tenantDomain;
     }

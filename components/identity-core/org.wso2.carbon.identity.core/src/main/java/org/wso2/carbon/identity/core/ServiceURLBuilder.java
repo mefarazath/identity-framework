@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.core;
 
 import org.wso2.carbon.identity.core.internal.DefaultServiceURLBuilder;
 import org.wso2.carbon.identity.core.internal.IdentityCoreServiceComponent;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 
 /**
  * URL Builder service interface.
@@ -34,6 +35,8 @@ public interface ServiceURLBuilder {
             return new DefaultServiceURLBuilder();
         }
     }
+
+    ServiceURLBuilder addOptions(ServiceUrlOptions options);
 
     /**
      * Returns {@link ServiceURLBuilder} appended the URL path.
