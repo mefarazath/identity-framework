@@ -64,6 +64,8 @@
         <module>components/configuration-mgt</module>
         <module>components/captcha-mgt</module>
         <module>components/cors-mgt</module>
+        <module>components/branding-preference-mgt</module>
+
         <module>features/security-mgt</module>
         <module>features/claim-mgt</module>
         <module>features/identity-core</module>
@@ -1488,6 +1490,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.branding.preference.mgt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!--Feature Dependencies Ends-->
 
