@@ -51,6 +51,7 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 
 import java.io.IOException;
@@ -71,8 +72,8 @@ public class DefaultLogoutRequestHandler implements LogoutRequestHandler {
     private static volatile DefaultLogoutRequestHandler instance;
     private static final Log AUDIT_LOG = CarbonConstants.AUDIT_LOG;
     private static final String LOGOUT_RETURN_URL_SP_PROPERTY = "logoutReturnUrl";
-    private static final String ENABLE_VALIDATING_LOGOUT_RETURN_URL_CONFIG = "EnableValidatingCommonAuthCallerPath";
-    private static final String DEFAULT_LOGOUT_URL_CONFIG = "DefaultLogoutUrl";
+    private static final String ENABLE_VALIDATING_LOGOUT_RETURN_URL_CONFIG = "CommonAuthCallerPath.EnableValidation";
+    private static final String DEFAULT_LOGOUT_URL_CONFIG = "CommonAuthCallerPath.DefaultUrl";
 
     public static DefaultLogoutRequestHandler getInstance() {
 
@@ -141,7 +142,11 @@ public class DefaultLogoutRequestHandler implements LogoutRequestHandler {
         // remove the SessionContext from the cache
         FrameworkUtils.removeSessionContextFromCache(context.getSessionIdentifier());
         // remove the cookie
-        FrameworkUtils.removeAuthCookie(request, response);
+        if (IdentityTenantUtil.isTenantedSessionsEnabled()) {
+            FrameworkUtils.removeAuthCookie(request, response, context.getLoginTenantDomain());
+        } else {
+            FrameworkUtils.removeAuthCookie(request, response);
+        }
         if (context.isPreviousSessionFound()) {
             // if this is the start of the logout sequence
             if (context.getCurrentStep() == 0) {

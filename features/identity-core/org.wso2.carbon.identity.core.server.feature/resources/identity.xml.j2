@@ -1129,19 +1129,19 @@
     </SelfRegistration>
 
     <LiteRegistration>
-            <Enable>{{identity_mgt.lite_user_registration.enable}}</Enable>
-            <LockOnCreation>{{identity_mgt.lite_user_registration.lock_on_creation}}</LockOnCreation>
-            <Notification>
-                <InternallyManage>{{identity_mgt.lite_user_registration.notification.manage_internally}}</InternallyManage>
-            </Notification>
-            <ReCaptcha>{{identity_mgt.lite_user_registration.recaptcha.enable}}</ReCaptcha>
-            <VerificationCode>
-                <ExpiryTime>{{identity_mgt.lite_user_registration.verification_email_validity}}</ExpiryTime>
-                <SMSOTP>
-                    <ExpiryTime>{{identity_mgt.lite_user_registration.verification_sms_validity}}</ExpiryTime>
-                </SMSOTP>
-            </VerificationCode>
-            <CallbackRegex>{{identity_mgt.lite_user_registration.callback_url}}</CallbackRegex>
+        <Enable>{{identity_mgt.lite_user_registration.enable}}</Enable>
+        <LockOnCreation>{{identity_mgt.lite_user_registration.lock_on_creation}}</LockOnCreation>
+        <Notification>
+            <InternallyManage>{{identity_mgt.lite_user_registration.notification.manage_internally}}</InternallyManage>
+        </Notification>
+        <ReCaptcha>{{identity_mgt.lite_user_registration.recaptcha.enable}}</ReCaptcha>
+        <VerificationCode>
+            <ExpiryTime>{{identity_mgt.lite_user_registration.verification_email_validity}}</ExpiryTime>
+            <SMSOTP>
+                <ExpiryTime>{{identity_mgt.lite_user_registration.verification_sms_validity}}</ExpiryTime>
+            </SMSOTP>
+        </VerificationCode>
+        <CallbackRegex>{{identity_mgt.lite_user_registration.callback_url}}</CallbackRegex>
     </LiteRegistration>
 
     <LoginIdentifiers>
@@ -2321,6 +2321,8 @@
     <EnableFederatedUserAssociation>{{user.association.enable_for_federated_users}}</EnableFederatedUserAssociation>
 
     <EnableTenantQualifiedUrls>{{tenant_context.enable_tenant_qualified_urls}}</EnableTenantQualifiedUrls>
+
+    <EnableTenantedSessions>{{tenant_context.enable_tenanted_sessions | default(false)}}</EnableTenantedSessions>
 
 
     <!--
